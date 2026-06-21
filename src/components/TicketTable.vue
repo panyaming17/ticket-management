@@ -23,15 +23,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import type { TableColumnsType } from 'ant-design-vue'
 import type { Ticket } from '../api/mockData'
-import { mockTickets } from '../api/mockData'
+import { useAuth } from '../composables/useAuth'
 
-const tickets = ref<Ticket[]>([...mockTickets])
+defineProps<{
+  tickets: Ticket[]
+}>()
 
-const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin')
+const emit = defineEmits<{
+  delete: [id: string]
+}>()
 
-const columns = [
+const { isAdmin } = useAuth()
+
+const columns: TableColumnsType = [
   { title: 'ID', dataIndex: 'id', key: 'id' },
   { title: 'Project', dataIndex: 'project', key: 'project' },
   { title: 'Overtime', dataIndex: 'overtime', key: 'overtime' },
@@ -41,9 +47,6 @@ const columns = [
 ]
 
 const handleDelete = (id: string) => {
-  tickets.value = tickets.value.filter((t) => t.id !== id)
+  emit('delete', id)
 }
-
-// Expose tickets for chart component
-defineExpose({ tickets })
 </script>
